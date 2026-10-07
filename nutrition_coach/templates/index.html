@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Nutrition Coach</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body>
+    <main class="container">
+        <header class="header">
+            <h1>AI Nutrition Coach</h1>
+            <p class="subtitle">Upload a photo of your meal to get an estimated calorie count and nutrient breakdown.</p>
+        </header>
+
+        <form method="POST" enctype="multipart/form-data" class="form" id="analyze-form">
+            <div class="input-group">
+                <label for="user_query">Ask a question about the uploaded image:</label>
+                <input type="text" name="user_query" id="user_query" value="{{ user_query }}" required>
+            </div>
+
+            <div class="input-group">
+                <label for="file">Choose an image:</label>
+                <input type="file" name="file" id="file" accept="image/*" required>
+            </div>
+
+            <button type="submit" class="btn-primary" id="submit-btn">Tell me the total calories</button>
+        </form>
+
+        <div id="loading-message" class="loading" hidden>
+            <p>Calculating, please wait...</p>
+        </div>
+
+        <!-- Preview of the selected image (filled in by app.js) -->
+        <div id="uploaded-image" class="image-preview"></div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% if response %}
+            <section class="result">
+                <h2>Here is a calorie breakdown of the food in this image:</h2>
+                {% if image_url %}
+                    <img src="{{ image_url }}" alt="Analyzed meal" class="uploaded-image-preview">
+                {% endif %}
+                <!-- Rendered from Markdown with raw HTML escaped, so |safe is OK here -->
+                <div class="response-content">{{ response|safe }}</div>
+            </section>
+        {% endif %}
+    </main>
+</body>
+</html>
